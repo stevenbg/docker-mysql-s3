@@ -33,4 +33,4 @@ ENV TZ "Europe/London"
 COPY entrypoint.sh entrypoint.sh
 COPY backup.sh backup.sh
 
-ENTRYPOINT [ "./entrypoint.sh" ]
+ENTRYPOINT [ "sh", "entrypoint.sh" ]
