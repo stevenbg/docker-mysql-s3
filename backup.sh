@@ -19,15 +19,13 @@ mv_s3 () {
 
     echo "Moving to ${S3_URL}..."
     aws $AWS_ARGS s3 mv "$SRC_FILE" "$S3_URL"
-
-    if [ $? != 0 ]; then
-        >&2 echo "Upload of ${DEST_FILE} failed"
-    fi
 }
 
 do_dump () {
+    echo "Dumping ${@}..."
     DUMP_FILE="/tmp/dump.sql"
     mysqldump $MYSQL_HOST_OPTS $MYSQLDUMP_OPTIONS -r $DUMP_FILE --databases ${@}
+    echo "Zipping..."
     bzip2 -9 $DUMP_FILE
     DUMP_FILE="${DUMP_FILE}.bz2"
 }
@@ -62,7 +60,6 @@ DUMP_START_TIME=$(date -u +"%Y%m%d-%H%M")
 
 if [ "${SPLIT_FILES}" == "yes" ]; then
     for DB in $MYSQLDUMP_DATABASE; do
-        echo "Dumping ${DB}..."
         # sets $DUMP_FILE
         do_dump $DB
 
@@ -75,7 +72,6 @@ if [ "${SPLIT_FILES}" == "yes" ]; then
         mv_s3 $DUMP_FILE $S3_FILE
     done
 else
-    echo "Dumping ${MYSQLDUMP_DATABASE}..."
     # sets $DUMP_FILE
     do_dump $MYSQLDUMP_DATABASE
 
