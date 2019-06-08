@@ -1,5 +1,4 @@
 #! /bin/sh
-set -e
 
 mv_s3 () {
     SRC_FILE=$1
@@ -24,10 +23,30 @@ mv_s3 () {
 do_dump () {
     echo "Dumping ${@}..."
     DUMP_FILE="/tmp/dump.sql"
-    mysqldump $MYSQL_HOST_OPTS $MYSQLDUMP_OPTIONS -r $DUMP_FILE --databases ${@}
-    echo "Zipping..."
-    bzip2 -9 $DUMP_FILE
+    mysqldump $MYSQL_HOST_OPTS $MYSQLDUMP_OPTIONS -r $DUMP_FILE --databases ${@} && \
+    echo "Zipping..." && \
+    bzip2 -9 $DUMP_FILE && \
     DUMP_FILE="${DUMP_FILE}.bz2"
+}
+
+error_panic () {
+    echo "backup error"
+
+    if [ "${ON_FAILURE}" == "smtp" ]; then
+        echo "sending email"
+        # -S ssl-verify=ignore \
+        echo "${SMTP_MESSAGE}" | \
+        mailx -v -r "${SMTP_FROM}" \
+            -s "Failed backup of ${MYSQL_HOST}/${MYSQLDUMP_DATABASE}" \
+            -S smtp="${SMTP_SERVER}" \
+            -S smtp-use-starttls \
+            -S smtp-auth=login \
+            -S smtp-auth-user="${SMTP_USERNAME}" \
+            -S smtp-auth-password="${SMTP_PASSWORD}" \
+            ${SMTP_RCPT}
+    fi
+
+    exit 1
 }
 
 if [ -z "${S3_BUCKET}" ]; then
@@ -47,7 +66,6 @@ if [ -z "${MYSQLDUMP_DATABASE}" ]; then
     exit 1
 fi
 
-
 export AWS_ACCESS_KEY_ID=$S3_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$S3_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=$S3_REGION
@@ -61,7 +79,10 @@ DUMP_START_TIME=$(date -u +"%Y%m%d-%H%M")
 if [ "${SPLIT_FILES}" == "yes" ]; then
     for DB in $MYSQLDUMP_DATABASE; do
         # sets $DUMP_FILE
-        do_dump $DB
+        
+        if ! do_dump $DB; then
+            error_panic
+        fi
 
         if [ -z "${S3_FILENAME}" ]; then
             S3_FILE="${DUMP_START_TIME}.${DB}.sql.bz2"
@@ -69,11 +90,15 @@ if [ "${SPLIT_FILES}" == "yes" ]; then
             S3_FILE="${DUMP_START_TIME}.${S3_FILENAME}.${DB}.sql.bz2"
         fi
 
-        mv_s3 $DUMP_FILE $S3_FILE
+        if ! mv_s3 $DUMP_FILE $S3_FILE; then
+            error_panic
+        fi
     done
 else
     # sets $DUMP_FILE
-    do_dump $MYSQLDUMP_DATABASE
+    if ! do_dump $MYSQLDUMP_DATABASE; then
+        error_panic
+    fi
 
     if [ -z "${S3_FILENAME}" ]; then
         S3_FILE="${DUMP_START_TIME}.dump.sql.bz2"
@@ -81,7 +106,9 @@ else
         S3_FILE="${DUMP_START_TIME}.${S3_FILENAME}.sql.bz2"
     fi
 
-    mv_s3 $DUMP_FILE $S3_FILE
+    if ! mv_s3 $DUMP_FILE $S3_FILE; then
+        error_panic
+    fi
 fi
 
 echo "Done"
