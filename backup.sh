@@ -34,12 +34,12 @@ error_panic () {
 
     if [ "${ON_FAILURE}" == "smtp" ]; then
         echo "sending email"
-        # -S ssl-verify=ignore \
         echo "${SMTP_MESSAGE}" | \
         mailx -v -r "${SMTP_FROM}" \
             -s "Failed backup of ${MYSQL_HOST}/${MYSQLDUMP_DATABASE}" \
             -S smtp="${SMTP_SERVER}" \
             -S smtp-use-starttls \
+            -S ssl-verify=ignore \
             -S smtp-auth=login \
             -S smtp-auth-user="${SMTP_USERNAME}" \
             -S smtp-auth-password="${SMTP_PASSWORD}" \

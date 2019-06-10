@@ -35,11 +35,11 @@ ENV S3_FILENAME ""
 ENV ON_FAILURE ""
 # the SMTP has to use TLS user/pass auth
 ENV SMTP_SERVER "smtp.eu.mailgun.org:587"
-ENV SMTP_USERNAME=""
-ENV SMTP_PASSWORD=""
-ENV SMTP_RCPT=""
-ENV SMTP_FROM=""
-ENV SMTP_MESSAGE="Backup failure."
+ENV SMTP_USERNAME ""
+ENV SMTP_PASSWORD ""
+ENV SMTP_RCPT ""
+ENV SMTP_FROM ""
+ENV SMTP_MESSAGE "Backup failure."
 
 ##
 # cron format schedule in the respective timezone
