@@ -25,7 +25,7 @@ do_dump () {
     DUMP_FILE="/tmp/dump.sql"
     mysqldump $MYSQL_HOST_OPTS $MYSQLDUMP_OPTIONS -r $DUMP_FILE --databases ${@} && \
     echo "Zipping..." && \
-    bzip2 -9 $DUMP_FILE && \
+    bzip2 -f9 $DUMP_FILE && \
     DUMP_FILE="${DUMP_FILE}.bz2"
 }
 
