@@ -1,7 +1,7 @@
 FROM alpine:3.9
 
 RUN apk update
-RUN apk add --no-cache mysql-client python py-pip tzdata heirloom-mailx
+RUN apk add --no-cache mysql-client python py-pip tzdata heirloom-mailx bash
 RUN pip install awscli
 RUN apk del py-pip
 
