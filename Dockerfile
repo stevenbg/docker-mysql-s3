@@ -4,8 +4,11 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python python-pip python-setuptools tzdata cron bzip2
 
 RUN pip install awscli
-RUN apt-get purge -y python-pip python-setuptools mysql-community-server-core
-RUN apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get purge -y python-pip python-setuptools \
+    mysql-common mysql-community-client mysql-community-server-core
+RUN apt-get autoremove -y
+RUN apt-get install --no-install-recommends -y mysql-community-client-core
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ##
 # mysql parameters
