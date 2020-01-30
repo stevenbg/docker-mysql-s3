@@ -1,9 +1,11 @@
-FROM alpine:3.9
+FROM mysql:8.0.16
 
-RUN apk update
-RUN apk add --no-cache mysql-client python py-pip tzdata heirloom-mailx bash
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    python python-pip python-setuptools tzdata cron bzip2
+
 RUN pip install awscli
-RUN apk del py-pip
+RUN apt-get purge -y python-pip python-setuptools mysql-community-server-core
+RUN apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ##
 # mysql parameters
