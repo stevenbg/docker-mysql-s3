@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/dash
 
 mv_s3 () {
     SRC_FILE=$1
@@ -32,7 +32,7 @@ do_dump () {
 error_panic () {
     echo "backup error"
 
-    if [ "${ON_FAILURE}" == "smtp" ]; then
+    if [ "${ON_FAILURE}" = "smtp" ]; then
         echo "sending email"
         echo "${SMTP_MESSAGE}" | \
         mailx -v -r "${SMTP_FROM}" \
@@ -76,7 +76,7 @@ if [ ! -z "${MYSQL_PASSWORD}" ]; then
 fi
 DUMP_START_TIME=$(date -u +"%Y%m%d-%H%M")
 
-if [ "${SPLIT_FILES}" == "yes" ]; then
+if [ "${SPLIT_FILES}" = "yes" ]; then
     for DB in $MYSQLDUMP_DATABASE; do
         # sets $DUMP_FILE
         
