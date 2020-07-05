@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set | sed 's/^\(.*\)$/export \1/g' > /myenv.sh
+set > /myenv.sh
 
 set -e
 
