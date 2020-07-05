@@ -13,7 +13,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 ##
 # mysql parameters
 # --net_buffer_length=16384 is a usual default, affects line lengths
-ENV MYSQLDUMP_OPTIONS "--quote-names --quick --add-drop-table --add-locks --allow-keywords --disable-keys --extended-insert --single-transaction --create-options --comments --net_buffer_length=16384"
+# --column-statistics=0 is for backward compat with 5.7
+ENV MYSQLDUMP_OPTIONS "--column-statistics=0 --quote-names --quick --add-drop-table --add-locks --allow-keywords --disable-keys --extended-insert --single-transaction --create-options --comments --net_buffer_length=16384"
 ENV MYSQLDUMP_DATABASE ""
 # if you specify multiple space-separated databases
 ENV SPLIT_FILES "no"

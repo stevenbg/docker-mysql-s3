@@ -1,4 +1,6 @@
-#! /bin/dash
+#!/bin/dash
+
+. /myenv.sh
 
 mv_s3 () {
     SRC_FILE=$1
