@@ -19,7 +19,7 @@ mv_s3 () {
     fi
 
     echo "Moving to ${S3_URL}..."
-    aws $AWS_ARGS s3 mv "$SRC_FILE" "$S3_URL"
+    aws $AWS_ARGS s3 mv "$SRC_FILE" "$S3_URL" --storage-class STANDARD_IA
 }
 
 do_dump () {
