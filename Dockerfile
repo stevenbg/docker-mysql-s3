@@ -1,4 +1,4 @@
-FROM mysql:8.0.16
+FROM mysql:8.0.21
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     python python-pip python-setuptools tzdata cron bzip2
