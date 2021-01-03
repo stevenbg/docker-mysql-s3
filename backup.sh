@@ -12,6 +12,12 @@ mv_s3 () {
         AWS_ARGS="--endpoint-url ${S3_ENDPOINT_URL}"
     fi
 
+    if [ -z "${S3_STORAGE_CLASS}" ]; then
+        S3_ARGS=""
+    else
+        S3_ARGS="--storage-class ${S3_STORAGE_CLASS}"
+    fi
+
     if [ -z "${S3_FOLDER}" ]; then
         S3_URL="s3://${S3_BUCKET}/${DEST_FILE}"
     else
@@ -19,7 +25,7 @@ mv_s3 () {
     fi
 
     echo "Moving to ${S3_URL}..."
-    aws $AWS_ARGS s3 mv "$SRC_FILE" "$S3_URL" --storage-class STANDARD_IA
+    aws $AWS_ARGS s3 mv "$SRC_FILE" "$S3_URL" $S3_ARGS
 }
 
 do_dump () {

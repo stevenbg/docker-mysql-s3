@@ -27,12 +27,13 @@ ENV MYSQL_PASSWORD ""
 
 ##
 # S3 target bucket and credentials
+ENV S3_ENDPOINT_URL ""
 ENV S3_ACCESS_KEY_ID ""
 ENV S3_SECRET_ACCESS_KEY ""
-ENV S3_BUCKET ""
-
 ENV S3_REGION "eu-central-1"
-ENV S3_ENDPOINT ""
+ENV S3_BUCKET ""
+ENV S3_STORAGE_CLASS ""
+
 # no leading or trailing /
 ENV S3_FOLDER ""
 # this will be added to the generated filename
