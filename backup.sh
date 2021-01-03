@@ -6,10 +6,10 @@ mv_s3 () {
     SRC_FILE=$1
     DEST_FILE=$2
 
-    if [ -z "${S3_ENDPOINT}" ]; then
+    if [ -z "${S3_ENDPOINT_URL}" ]; then
         AWS_ARGS=""
     else
-        AWS_ARGS="--endpoint-url ${S3_ENDPOINT}"
+        AWS_ARGS="--endpoint-url ${S3_ENDPOINT_URL}"
     fi
 
     if [ -z "${S3_FOLDER}" ]; then
