@@ -58,11 +58,6 @@ COPY entrypoint.sh entrypoint.sh
 COPY backup.sh backup.sh
 
 RUN aws configure set plugins.endpoint awscli_plugin_endpoint
-
-RUN aws configure set region $S3_REGION
-RUN aws configure set aws_access_key_id $S3_ACCESS_KEY_ID
-RUN aws configure set aws_secret_access_key $S3_SECRET_ACCESS_KEY
-
 RUN aws configure set s3.signature_version "s3v4"
 RUN aws configure set s3.max_concurrent_requests "100"
 RUN aws configure set s3.max_queue_size "1000"
