@@ -31,11 +31,14 @@ mv_s3 () {
 do_dump () {
     echo "Dumping ${@}..."
     DUMP_FILE="/tmp/dump.sql"
-    mysqldump $MYSQL_HOST_OPTS $MYSQLDUMP_OPTIONS -r $DUMP_FILE --databases ${@} && \
-    echo "Importing to _b..." && \
-    mysql $MYSQL_HOST_OPTS ${@}_b -e "DROP DATABASE IF EXISTS ${@}_b" && \
-    mysql $MYSQL_HOST_OPTS ${@}_b -e "CREATE DATABASE ${@}_b" && \
-    mysql $MYSQL_HOST_OPTS ${@}_b < $DUMP_FILE && \
+    mysqldump $MYSQL_HOST_OPTS $MYSQLDUMP_OPTIONS -r $DUMP_FILE ${@} && \
+    CLONE_DB="${@}_b"
+    echo "Drop $CLONE_DB ..." && \
+    mysql $MYSQL_HOST_OPTS -e "DROP DATABASE IF EXISTS $CLONE_DB" && \
+    echo "Create $CLONE_DB ..." && \
+    mysql $MYSQL_HOST_OPTS -e "CREATE DATABASE $CLONE_DB" && \
+    echo "Import $CLONE_DB ..." && \
+    mysql $MYSQL_HOST_OPTS $CLONE_DB < $DUMP_FILE && \
     echo "Zipping..." && \
     bzip2 -f9 $DUMP_FILE && \
     DUMP_FILE="${DUMP_FILE}.bz2"
@@ -88,7 +91,7 @@ if [ ! -z "${MYSQL_PASSWORD}" ]; then
 fi
 DUMP_START_TIME=$(date -u +"%Y%m%d-%H%M")
 
-if [ "${SPLIT_FILES}" = "yes" ]; then
+# if [ "${SPLIT_FILES}" = "yes" ]; then
     for DB in $MYSQLDUMP_DATABASE; do
         # sets $DUMP_FILE
 
@@ -106,21 +109,21 @@ if [ "${SPLIT_FILES}" = "yes" ]; then
             error_panic
         fi
     done
-else
-    # sets $DUMP_FILE
-    if ! do_dump $MYSQLDUMP_DATABASE; then
-        error_panic
-    fi
+# else
+#     # sets $DUMP_FILE
+#     if ! do_dump $MYSQLDUMP_DATABASE; then
+#         error_panic
+#     fi
 
-    if [ -z "${S3_FILENAME}" ]; then
-        S3_FILE="${DUMP_START_TIME}.dump.sql.bz2"
-    else
-        S3_FILE="${DUMP_START_TIME}.${S3_FILENAME}.sql.bz2"
-    fi
+#     if [ -z "${S3_FILENAME}" ]; then
+#         S3_FILE="${DUMP_START_TIME}.dump.sql.bz2"
+#     else
+#         S3_FILE="${DUMP_START_TIME}.${S3_FILENAME}.sql.bz2"
+#     fi
 
-    if ! mv_s3 $DUMP_FILE $S3_FILE; then
-        error_panic
-    fi
-fi
+#     if ! mv_s3 $DUMP_FILE $S3_FILE; then
+#         error_panic
+#     fi
+# fi
 
 echo "Done"

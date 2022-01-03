@@ -1,7 +1,7 @@
 FROM mysql:8.0.21
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    python python-pip python-setuptools tzdata cron bzip2
+    python python-pip python-setuptools tzdata cron bzip2 less
 
 RUN pip install awscli
 RUN pip install awscli-plugin-endpoint
@@ -16,10 +16,10 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # --net_buffer_length=16384 is a usual default, affects line lengths
 # --column-statistics=0 is for backward compat with 5.7
 # --no-tablespaces to avoid permission error
-ENV MYSQLDUMP_OPTIONS "--no-tablespaces --column-statistics=0 --quote-names --quick --add-drop-table --add-locks --allow-keywords --disable-keys --extended-insert --single-transaction --create-options --comments --net_buffer_length=16384"
+ENV MYSQLDUMP_OPTIONS "--no-create-db --no-tablespaces --column-statistics=0 --quote-names --quick --add-drop-table --add-locks --allow-keywords --disable-keys --extended-insert --single-transaction --create-options --comments --net_buffer_length=16384"
 ENV MYSQLDUMP_DATABASE ""
 # if you specify multiple space-separated databases
-ENV SPLIT_FILES "no"
+# ENV SPLIT_FILES "yes"
 ENV MYSQL_HOST "localhost"
 ENV MYSQL_PORT "3306"
 ENV MYSQL_USER "root"
