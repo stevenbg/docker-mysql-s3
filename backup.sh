@@ -32,6 +32,10 @@ do_dump () {
     echo "Dumping ${@}..."
     DUMP_FILE="/tmp/dump.sql"
     mysqldump $MYSQL_HOST_OPTS $MYSQLDUMP_OPTIONS -r $DUMP_FILE --databases ${@} && \
+    echo "Importing to _b..." && \
+    mysql $MYSQL_HOST_OPTS ${@}_b -e "DROP DATABASE IF EXISTS ${@}_b" && \
+    mysql $MYSQL_HOST_OPTS ${@}_b -e "CREATE DATABASE ${@}_b" && \
+    mysql $MYSQL_HOST_OPTS ${@}_b < $DUMP_FILE && \
     echo "Zipping..." && \
     bzip2 -f9 $DUMP_FILE && \
     DUMP_FILE="${DUMP_FILE}.bz2"
@@ -87,7 +91,7 @@ DUMP_START_TIME=$(date -u +"%Y%m%d-%H%M")
 if [ "${SPLIT_FILES}" = "yes" ]; then
     for DB in $MYSQLDUMP_DATABASE; do
         # sets $DUMP_FILE
-        
+
         if ! do_dump $DB; then
             error_panic
         fi
